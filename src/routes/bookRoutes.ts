@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
     getAllBooks,
+    getBookById,
     addBook,
     updateBook,
     deleteBook,
@@ -12,14 +13,15 @@ import {
 const router: Router = Router();
 
 /**
- * Define routes for book management
+ * Book management routes
  */
-router.get("/", getAllBooks);
-router.post("/", addBook);
-router.put("/:id", updateBook);
-router.delete("/:id", deleteBook);
-router.post("/:id/borrow", borrowBook);
-router.post("/:id/return", returnBook);
-router.get("/recommendations", getRecommendations);
+router.get("/", getAllBooks);                  // Get all books
+router.get("/:id", getBookById);               // Get a single book by ID
+router.post("/", addBook);                     // Add a new book
+router.put("/:id", updateBook);               // Update a book by ID
+router.delete("/:id", deleteBook);            // Delete a book by ID
+router.post("/:id/borrow", borrowBook);       // Borrow a book
+router.post("/:id/return", returnBook);       // Return a book
+router.get("/recommendations", getRecommendations);  // Get recommendations
 
 export default router;
