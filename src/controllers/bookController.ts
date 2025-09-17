@@ -2,6 +2,9 @@ import { Request, Response } from "express";
 import { HTTP_STATUS } from "../constants/httpConstants";
 import * as bookService from "../services/bookService";
 
+/**
+ * Get all books
+ */
 export const getAllBooks = (req: Request, res: Response): void => {
     try {
         const books = bookService.getAllBooks();
@@ -16,10 +19,71 @@ export const getAllBooks = (req: Request, res: Response): void => {
     }
 };
 
+/**
+ * Get a book by ID
+ */
+export const getBookById = (req: Request, res: Response): void => {
+    try {
+        const { id } = req.params;
+        const book = bookService.getBookById(id);
+
+        if (book) {
+            res.status(HTTP_STATUS.OK).json({
+                message: "Book retrieved",
+                data: book,
+            });
+        } else {
+            res.status(HTTP_STATUS.NOT_FOUND).json({
+                message: "Book not found",
+            });
+        }
+    } catch (error) {
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
+            message: "Error retrieving book",
+        });
+    }
+};
+
+/**
+ * Add a new book with validation (Ticket #5)
+ */
 export const addBook = (req: Request, res: Response): void => {
     try {
-        const newBook = req.body;
-        const createdBook = bookService.addBook(newBook);
+        // Destructure and trim fields from request body
+        const { title, author, genre } = req.body;
+        const trimmedTitle = title?.trim();
+        const trimmedAuthor = author?.trim();
+        const trimmedGenre = genre?.trim();
+
+        // Validate required fields
+        if (!trimmedTitle) {
+            res.status(HTTP_STATUS.BAD_REQUEST).json({
+                message: "Title is required and cannot be empty",
+            });
+            return;
+        }
+
+        if (!trimmedAuthor) {
+            res.status(HTTP_STATUS.BAD_REQUEST).json({
+                message: "Author is required and cannot be empty",
+            });
+            return;
+        }
+
+        if (!trimmedGenre) {
+            res.status(HTTP_STATUS.BAD_REQUEST).json({
+                message: "Genre is required and cannot be empty",
+            });
+            return;
+        }
+
+        // Call service with trimmed fields (type-safe)
+        const createdBook = bookService.addBook({
+            title: trimmedTitle,
+            author: trimmedAuthor,
+            genre: trimmedGenre,
+        });
+
         res.status(HTTP_STATUS.CREATED).json({
             message: "Book added",
             data: createdBook,
@@ -31,11 +95,15 @@ export const addBook = (req: Request, res: Response): void => {
     }
 };
 
+/**
+ * Update an existing book
+ */
 export const updateBook = (req: Request, res: Response): void => {
     try {
         const { id } = req.params;
         const updatedData = req.body;
         const updatedBook = bookService.updateBook(id, updatedData);
+
         if (updatedBook) {
             res.status(HTTP_STATUS.OK).json({
                 message: "Book updated",
@@ -53,10 +121,14 @@ export const updateBook = (req: Request, res: Response): void => {
     }
 };
 
+/**
+ * Delete a book
+ */
 export const deleteBook = (req: Request, res: Response): void => {
     try {
         const { id } = req.params;
         const success = bookService.deleteBook(id);
+
         if (success) {
             res.status(HTTP_STATUS.OK).json({ message: "Book deleted" });
         } else {
@@ -71,11 +143,15 @@ export const deleteBook = (req: Request, res: Response): void => {
     }
 };
 
+/**
+ * Borrow a book
+ */
 export const borrowBook = (req: Request, res: Response): void => {
     try {
         const { id } = req.params;
         const borrowerId = req.body.borrowerId;
         const result = bookService.borrowBook(id, borrowerId);
+
         if (result) {
             res.status(HTTP_STATUS.OK).json({
                 message: "Book borrowed",
@@ -93,10 +169,14 @@ export const borrowBook = (req: Request, res: Response): void => {
     }
 };
 
+/**
+ * Return a book
+ */
 export const returnBook = (req: Request, res: Response): void => {
     try {
         const { id } = req.params;
         const result = bookService.returnBook(id);
+
         if (result) {
             res.status(HTTP_STATUS.OK).json({ message: "Book returned" });
         } else {
@@ -111,6 +191,9 @@ export const returnBook = (req: Request, res: Response): void => {
     }
 };
 
+/**
+ * Get recommended books
+ */
 export const getRecommendations = (req: Request, res: Response): void => {
     try {
         const recommendations = bookService.getRecommendations();
