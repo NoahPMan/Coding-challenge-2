@@ -45,12 +45,45 @@ export const getBookById = (req: Request, res: Response): void => {
 };
 
 /**
- * Add a new book
+ * Add a new book with validation (Ticket #5)
  */
 export const addBook = (req: Request, res: Response): void => {
     try {
-        const newBook = req.body;
-        const createdBook = bookService.addBook(newBook);
+        // Destructure and trim fields from request body
+        const { title, author, genre } = req.body;
+        const trimmedTitle = title?.trim();
+        const trimmedAuthor = author?.trim();
+        const trimmedGenre = genre?.trim();
+
+        // Validate required fields
+        if (!trimmedTitle) {
+            res.status(HTTP_STATUS.BAD_REQUEST).json({
+                message: "Title is required and cannot be empty",
+            });
+            return;
+        }
+
+        if (!trimmedAuthor) {
+            res.status(HTTP_STATUS.BAD_REQUEST).json({
+                message: "Author is required and cannot be empty",
+            });
+            return;
+        }
+
+        if (!trimmedGenre) {
+            res.status(HTTP_STATUS.BAD_REQUEST).json({
+                message: "Genre is required and cannot be empty",
+            });
+            return;
+        }
+
+        // Call service with trimmed fields (type-safe)
+        const createdBook = bookService.addBook({
+            title: trimmedTitle,
+            author: trimmedAuthor,
+            genre: trimmedGenre,
+        });
+
         res.status(HTTP_STATUS.CREATED).json({
             message: "Book added",
             data: createdBook,
