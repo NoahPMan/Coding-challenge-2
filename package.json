@@ -1,14 +1,13 @@
 {
   "name": "coding-challenge-2",
   "version": "1.0.0",
-  "main": "index.js",
+  "description": "Digital Library Service for managing book inventory and user borrowing.",
+  "main": "dist/server.js",
   "scripts": {
+    "start": "ts-node src/server.ts",
+    "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "dependencies": {
     "express": "^5.1.0"
   },
@@ -17,5 +16,8 @@
     "@types/node": "^24.5.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.2"
-  }
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }
